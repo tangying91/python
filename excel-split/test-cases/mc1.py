@@ -1,7 +1,6 @@
 #!/usr/bin/python3
 # -*- coding: UTF-8 -*-
 
-
 import pandas as pd
 
 # 读取 Excel 文件中的所有工作表
@@ -27,17 +26,4 @@ for string in strings:
         for sheet_name, filtered_df in filtered_sheets_dict.items():
             filtered_df.to_excel(writer, sheet_name=sheet_name, index=False)
 
-# # 创建一个空的字典来保存筛选后的工作表数据
-# filtered_sheets_dict = {}
-#
-# # 遍历每个工作表
-# for sheet_name, df in sheets_dict.items():
-#     # 筛选含有指定字符串的行数据
-#     filtered_df = df[df.astype(str).apply(lambda row: any('北京分公司' in cell for cell in row), axis=1)]
-#     # 将筛选后的数据添加到结果字典中
-#     filtered_sheets_dict[sheet_name] = filtered_df
-#
-# # 导出筛选后的数据到Excel文件，每个工作表分别保存为一个sheet
-# with pd.ExcelWriter('output.xlsx') as writer:
-#     for sheet_name, filtered_df in filtered_sheets_dict.items():
-#         filtered_df.to_excel(writer, sheet_name=sheet_name, index=False)
+

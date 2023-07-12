@@ -1,6 +1,8 @@
 import warnings
 
 # 过滤无意义的警告
+from openpyxl import load_workbook
+
 warnings.filterwarnings('ignore')
 
 
@@ -56,3 +58,50 @@ def filter_sheet_data(book_sheet, headers, filters):
 def set_sheet_column_width(book_sheet, columns, width):
     for column in columns:
         book_sheet.column_dimensions[column].width = width
+
+
+# 用于Excel表格拆分
+# 第一行默认为标题栏，不进行任何处理
+# 根据关键字拆分Excel，同时输出新的的拆分后的excel，保留所有格式
+# input_file_name 源文件
+# split_keys 拆分关键字数组
+# keep_sheets 需要保留的分页
+# output_file_suffix 输出的新文件后缀
+def excel_split(input_file_name, split_keys, keep_sheets, output_file_path, output_file_suffix):
+    print(input_file_name, "excel split start..")
+    for keyword in split_keys:
+        # 加载Excel文件，仅数据处理很重要，这个可以规避excel公式问题
+        wb = load_workbook(input_file_name, data_only=True)
+
+        # 遍历每个工作表
+        for sheet_name in wb.sheetnames:
+            # 获取当前工作表
+            sheet = wb[sheet_name]
+
+            # 删除不要的分页
+            if sheet_name not in keep_sheets:
+                wb.remove(sheet)
+                continue
+
+            # 定义要删除的行的索引
+            rows_to_delete = []
+
+            # 遍历每一行，第一行默认为标题，不处理
+            for row_index, row in enumerate(sheet.iter_rows(min_row=2, values_only=True), start=2):
+                delete = True
+                for cell in row:
+                    if str(cell) == keyword:
+                        delete = False
+                        break
+                if delete:
+                    rows_to_delete.append(row_index)
+
+            print(keyword, sheet_name, "分页处理完成")
+            # 删除要删除的行（注意要从后向前删除）
+            for row_index in reversed(rows_to_delete):
+                sheet.delete_rows(row_index)
+
+        # 关闭Excel文件
+        wb.save(output_file_path + keyword + output_file_suffix + '.xlsx')
+        wb.close()
+        print(keyword, '全部处理完毕')
