@@ -3,6 +3,8 @@
 
 import pandas as pd
 
+# 使用pd数据预处理
+
 # 读取 Excel 文件中的所有工作表
 sheets_dict = pd.read_excel('2023年Q1业绩综合分析V4终版-4.11.xlsx', sheet_name=None)
 

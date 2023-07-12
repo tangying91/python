@@ -1,3 +1,4 @@
+import datetime
 import warnings
 
 # 过滤无意义的警告
@@ -6,13 +7,14 @@ from openpyxl import load_workbook
 warnings.filterwarnings('ignore')
 
 
-# 根据header找到列的下标，从 0 开始
+# 根据header找到列的位置
+# header默认在第一行
 def get_header_column_idx(book_sheet, header):
     for row in book_sheet.iter_rows(min_row=1, max_row=1):
         for cell in row:
             if header == cell.value:
-                return cell.column - 1
-    return ""
+                return cell.column
+    return -1
 
 
 # 获取某一列的不重复数据
@@ -69,6 +71,8 @@ def set_sheet_column_width(book_sheet, columns, width):
 # output_file_suffix 输出的新文件后缀
 def excel_split(input_file_name, split_keys, keep_sheets, output_file_path, output_file_suffix):
     print(input_file_name, "excel split start..")
+    # 记录开始时间
+    start_time = datetime.datetime.now()
     for keyword in split_keys:
         # 加载Excel文件，仅数据处理很重要，这个可以规避excel公式问题
         wb = load_workbook(input_file_name, data_only=True)
@@ -104,4 +108,34 @@ def excel_split(input_file_name, split_keys, keep_sheets, output_file_path, outp
         # 关闭Excel文件
         wb.save(output_file_path + keyword + output_file_suffix + '.xlsx')
         wb.close()
-        print(keyword, '全部处理完毕')
+        print(keyword, '全部处理完毕，耗时', (datetime.datetime.now() - start_time).total_seconds(), "秒")
+
+
+# Excel 对指定列重新编号
+# input_file_name 源文件
+# header 指定列标题
+def excel_renumber(input_file_name, header):
+    print(input_file_name, "excel renumber start..")
+    # 记录开始时间
+    start_time = datetime.datetime.now()
+    # 打开表格
+    wb = load_workbook(input_file_name)
+
+    # 获取所有表名称
+    for sheet_name in wb.sheetnames:
+        # 获取当前工作表
+        sheet = wb[sheet_name]
+        # 获取最大行数
+        max_row = sheet.max_row
+
+        # 遍历每一行，为第一列赋予自动编号
+        column = get_header_column_idx(sheet, header)
+        if column != -1:
+            # 因为第一行是标题，所以实际值行号往后加1
+            for idx in range(1, max_row):
+                sheet.cell(row=idx + 1, column=column).value = idx
+
+    # 保存文件
+    wb.save(input_file_name)
+    print(input_file_name, '重新编号完成，耗时', (datetime.datetime.now() - start_time).total_seconds(), "秒")
+

@@ -1,5 +1,8 @@
 import openpyxl
 
+# 删除空分页
+# 判断第二行是否为空或没有数据
+
 # 打开 Excel 文件
 workbook = openpyxl.load_workbook('./files/北京分公司-2023年Q2销售业绩结算表-0703.xlsx')
 

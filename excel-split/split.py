@@ -1,4 +1,4 @@
-from lib import my_xlsx
+from lib import my_xlsx, my_file
 
 # 拆分表格的关键字
 split_keys = ['苏皖大区', '上海分公司', '北京分公司', '北区', '西区', '物流交通', '南区', '浙江大区', '福建办事处']
@@ -14,3 +14,8 @@ output_file_suffix = '-2023年Q2销售业绩结算表-0703'
 # 开始处理Excel表格
 my_xlsx.excel_split(input_file_name, split_keys, keep_sheets, output_file_path, output_file_suffix)
 
+# 对目录下的Excel文件，序号列重新编号
+for file_path in my_file.get_files(output_file_path, '*.xlsx'):
+    my_xlsx.excel_renumber(file_path, '序号')
+
+print("All tasks have been completed.")
